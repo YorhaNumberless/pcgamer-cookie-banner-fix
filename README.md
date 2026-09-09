@@ -54,3 +54,64 @@ the same cause.
 
 uBlock Origin's Cookie Notices lists try to click the reject button for
 you, via `trusted-click-element`. On this CMP those scriptlets time out:
+[cdn.privacy-mgmt.com][trusted-click-element : button.sp_choice_type_REJECT_ALL :: 2000] Waiting for button.sp_choice_type_REJECT_ALL
+[cdn.privacy-mgmt.com][trusted-click-element : button.message-button[aria-label="More Options"]] Timed out waiting on button.message-button[...]
+
+Worse, those same lists ship `@@` exception rules that allowlist
+`cdn.privacy-mgmt.com` outright. An exception rule beats an ordinary
+block rule, so a normal filter against the banner does nothing at all.
+That is the part that traps most people.
+
+The banner also lives inside an iframe, which is why uBlock's element
+picker selects the entire page and can't target it.
+
+## The filter
+||cdn.privacy-mgmt.com/index.html$subdocument,important,domain=pcgamer.com
+- `||cdn.privacy-mgmt.com` — the Sourcepoint CDN
+- `/index.html` — the banner document itself
+- `subdocument` — iframes only, so the CMP scripts are untouched
+- `important` — overrides the `@@` allowlist rules from other lists
+- `domain=pcgamer.com` — scoped to this site only
+
+## How to use
+
+Requires uBlock Origin.
+
+**First, reject once.** Load pcgamer.com and click "only essentials"
+before subscribing. This filter blocks the banner, it does not answer
+it — so your stored rejection needs to already be in place. Do this
+once and it stays.
+
+Then:
+
+1. Open uBlock Origin → **Dashboard** → **Filter lists**
+2. Scroll to the bottom and tick **Import...**
+3. Paste this URL into the box:
+https://raw.githubusercontent.com/YorhaNumberless/pcgamer-cookie-banner-fix/main/pcgamer-cookie-banner-fix.txt
+
+
+4. Click **Apply changes**
+
+uBlock re-fetches the list on its own, so any rules added later arrive
+automatically.
+
+If you'd rather not subscribe to anything, paste the single filter line
+above into **Dashboard → My filters** and click **Apply changes**.
+Same result, no updates.
+
+## Other sites doing this
+
+Open an issue with:
+
+- the URL
+- the CMP domain
+- the `messages` request payload showing `hasConsentData` and
+  `consentedToAll`
+- whether accepting all stops the prompts
+
+Evidence, not complaints. It's what makes these reports impossible to
+dismiss.
+
+## License
+
+MIT
